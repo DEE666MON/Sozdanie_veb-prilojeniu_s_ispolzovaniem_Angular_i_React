@@ -65,6 +65,7 @@ type Task = {
 
 import { useState, useEffect } from "react";
 import { TodoItem } from "./TodoItem"
+
 export default function App(){
   const [tasks, setTasks] = useState<Task[]>(() => {
     const saved = localStorage.getItem('tasks')
@@ -121,10 +122,10 @@ export default function App(){
     <div className="min-h-screen bg-gray-100 flex justify-center pt-16">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Мои задачи</h1>
-        <div className="flex gap-2">
-          <button onClick={() => setFilter('all')} className="{``}">Всё</button>
-          <button onClick={() => setFilter('active')}>Активные</button>
-          <button onClick={() => setFilter('done')}>Выполненные</button>
+        <div className="flex gap-2 my-5">
+          <button onClick={() => setFilter('all')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Всё</button>
+          <button onClick={() => setFilter('active')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'active' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Активные</button>
+          <button onClick={() => setFilter('done')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'done' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Выполненные</button>
         </div>
         <ul>
           {filteredTasks.map((task) => (
@@ -140,12 +141,13 @@ export default function App(){
               setEditingValue={setEditingValue}/>
           ))}
         </ul>
-        <input type="text" placeholder="Задача" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => {
-          if (e.key === 'Enter') handleAdd();}}
-        />
-        <input type="text" placeholder="Приоритет" value={priorityValue} onChange={(e) => setPriorityValue(e.target.value)} onKeyDown={(e) => {
-          if (e.key === 'Enter') handleAdd();}}/>
-        <button onClick={handleAdd}>Добавить задачу</button>
+        <div className="flex flex-col gap-1 mt-5">
+          <input type="text" placeholder="Задача" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => {
+            if (e.key === 'Enter') handleAdd();}} className="border border-gray-300 rounded-lg px-3 py-1 text-sm outline-none focus:border-blue-400 transition-colors"/>
+          <input type="text" placeholder="Приоритет" value={priorityValue} onChange={(e) => setPriorityValue(e.target.value)} onKeyDown={(e) => {
+            if (e.key === 'Enter') handleAdd();}} className="border border-gray-300 rounded-lg px-3 py-1 text-sm outline-none focus:border-blue-400 transition-colors"/>
+          <button onClick={handleAdd} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition-colors">Добавить задачу</button>
+        </div>
       </div>
     </div>
   )
