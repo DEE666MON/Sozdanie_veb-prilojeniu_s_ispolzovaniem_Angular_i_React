@@ -20,7 +20,7 @@ export function TodoItem({task, editingId, editingValue, onToggle, onDelete, onE
                 <span style={{textDecoration: task.done ? 'line-through': 'none'}}>{task.title} ({task.priority})</span>
             )}
             {editingId === task.id ? (
-                <button onClick={() => onSave(task.id)}>Сохранить</button>
+                <button onClick={() => onSave(task.id)} className="bg-blue-500">Сохранить</button>
             ) : (
                 <button onClick={() => onEdit(task)}>Изменить</button>
             )}

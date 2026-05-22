@@ -118,33 +118,35 @@ export default function App(){
     return true
   })
   return (
-    <div>
-      <h1>Мои задачи</h1>
-      <div>
-        <button onClick={() => setFilter('all')}>Всё</button>
-        <button onClick={() => setFilter('active')}>Активные</button>
-        <button onClick={() => setFilter('done')}>Выполненные</button>
+    <div className="min-h-screen bg-gray-100 flex justify-center pt-16">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Мои задачи</h1>
+        <div className="flex gap-2">
+          <button onClick={() => setFilter('all')} className="{``}">Всё</button>
+          <button onClick={() => setFilter('active')}>Активные</button>
+          <button onClick={() => setFilter('done')}>Выполненные</button>
+        </div>
+        <ul>
+          {filteredTasks.map((task) => (
+            <TodoItem
+              key={task.id}
+              task={task} 
+              editingId={editingId} 
+              editingValue={editingValue}
+              onToggle={handleToggle} 
+              onDelete={handleDelete} 
+              onEdit={handleEdit} 
+              onSave={handleSave} 
+              setEditingValue={setEditingValue}/>
+          ))}
+        </ul>
+        <input type="text" placeholder="Задача" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => {
+          if (e.key === 'Enter') handleAdd();}}
+        />
+        <input type="text" placeholder="Приоритет" value={priorityValue} onChange={(e) => setPriorityValue(e.target.value)} onKeyDown={(e) => {
+          if (e.key === 'Enter') handleAdd();}}/>
+        <button onClick={handleAdd}>Добавить задачу</button>
       </div>
-      <ul>
-        {filteredTasks.map((task) => (
-          <TodoItem
-            key={task.id}
-            task={task} 
-            editingId={editingId} 
-            editingValue={editingValue}
-            onToggle={handleToggle} 
-            onDelete={handleDelete} 
-            onEdit={handleEdit} 
-            onSave={handleSave} 
-            setEditingValue={setEditingValue}/>
-        ))}
-      </ul>
-      <input type="text" placeholder="Задача" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => {
-        if (e.key === 'Enter') handleAdd();}}
-      />
-      <input type="text" placeholder="Приоритет" value={priorityValue} onChange={(e) => setPriorityValue(e.target.value)} onKeyDown={(e) => {
-        if (e.key === 'Enter') handleAdd();}}/>
-      <button onClick={handleAdd}>Добавить задачу</button>
     </div>
   )
 }
