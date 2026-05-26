@@ -1,153 +1,91 @@
-// function Hello(props){
-//   return <h1>Привет!, {props.name}</h1>
-// }
-// function App(){
-//   return (
-//     <div>
-//       <Hello name="Anna"/>
-//       <Hello name="Boris"/>
-//       <Hello name="Viktoria"/>
-//       <Hello name="Pavel"/>
-//     </div>
-//   )
-// }
-// function Hello({age}){
-//   return <h1>Привет!, {age >= 18 ? "Взрослый" : "Ребёнок"}</h1>
-// }
-// function App(){
-//   return (
-//     <div>
-//       <Hello age = {16}/>
-//       <Hello age = {18}/>
-//       <Hello age = {50}/>
-//       <Hello age = {20}/>
-//     </div>
-//   )
-// }
-// function Hello({name}: {name: string}){
-//   return <h1>Привет!, {name}</h1>
-// }
-// export default function App(){
-//   return (
-//     <div>
-//       <Hello name="Anna"/>
-//       <Hello name="Boris"/>
-//       <Hello name="Viktoria"/>
-//       <Hello name="Pavel"/>
-//     </div>
-//   )
-// }
-
-// import { useState } from "react";
-// export default function App(){
-//   const [count, setCount] = useState(0)
-//   const [name, setName] = useState("Пусто")
-//   return (
-//     <div>
-//       <h1>Счёт: {count}</h1>
-//       <h1>Текущее имя: {name}</h1>
-//       <button onClick={() => setCount(count + 1)}>Прибавить</button>
-//       <button onClick={() => setCount(count - 1)}>Вычесть</button>
-//       <button onClick={() => setCount(0)}>Сборосить</button>
-//       <div>
-//         <button onClick={() => setName("Дмитрий")}>Переименовать</button>
-//       </div>
-//     </div>
-//   )
-// }
-
-type Task = {
+type Order = {
   id: number
-  title: string
-  priority: string
-  done: boolean
+  customerName: string
+  coffeeType: string
+  status: boolean
 }
 
 import { useState, useEffect } from "react";
-import { TodoItem } from "./TodoItem"
+import { OrderCard } from "./OrderCard"
 
 export default function App(){
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const saved = localStorage.getItem('tasks')
+  const [orders, setOrders] = useState<Order[]>(() => {
+    const saved = localStorage.getItem('orders')
     return saved ? JSON.parse(saved) : []
   })
   const [inputValue, setInputValue] = useState("")
-  const [priorityValue, setPriorityValue] = useState("")
-  const [filter, setFilter] = useState<'all' | 'active' | 'done'>('all')
+  const [coffeeTypeValue, setCoffeeTypeValue] = useState("")
+  const [filter, setFilter] = useState<'all' | 'pending' | 'ready'>('all')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editingValue, setEditingValue] = useState('')
 
-  const handleAdd = () => {
+  const handleAddOrder = () => {
     if (inputValue.trim() === '') return
-    const priority = priorityValue.trim() === '' ? 'Cредний' : priorityValue
-    const newTask: Task = {
+    if(coffeeTypeValue.trim() === '') return
+    const newOrder: Order = {
       id: Date.now(),
-      title: inputValue,
-      priority: priority,
-      done: false
+      customerName: inputValue,
+      coffeeType: coffeeTypeValue,
+      status: false
     }
-    if (tasks.some((task) => task.title === newTask.title)){
-      alert("Такая задача уже создана!")
-      return
-    }
-    setTasks([...tasks, newTask])
+    setOrders([...orders, newOrder])
     setInputValue('')
-    setPriorityValue('')
+    setCoffeeTypeValue('')
   }
-  const handleDelete = (idToDelete: number) => {
-    setTasks(tasks.filter((task) => task.id !== idToDelete))
+  const handleDeleteOrder = (idToDelete: number) => {
+    setOrders(orders.filter((order) => order.id !== idToDelete))
   }
   const handleToggle = (idToToggle: number) => {
-    setTasks(tasks.map((task) => task.id === idToToggle ? {...task, done: !task.done} : task))
+    setOrders(orders.map((order) => order.id === idToToggle ? {...order, status: !order.status} : order))
   }
-  const handleEdit = (task: Task) => {
-    setEditingId(task.id)
-    setEditingValue(task.title)
+  const handleEdit = (order: Order) => {
+    setEditingId(order.id)
+    setEditingValue(order.customerName)
   }
   const handleSave = (id: number) => {
     if (editingValue.trim() == "") return
-    setTasks(tasks.map((task) => task.id === id ? {...task, title: editingValue} : task))
+    setOrders(orders.map((order) => order.id === id ? {...order, customerName: editingValue} : order))
     setEditingId(null)
     setEditingValue('')
   }
   useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks))
-  }, [tasks])
-  const filteredTasks = tasks.filter(task => {
-    if (filter === 'active') return !task.done
-    if (filter === 'done') return task.done
+    localStorage.setItem('orders', JSON.stringify(orders))
+  }, [orders])
+  const filteredOrders = orders.filter(order => {
+    if (filter === 'pending') return !order.status
+    if (filter === 'ready') return order.status
     return true
   })
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center pt-16">
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Мои задачи</h1>
+    <div className="min-h-screen bg-yellow-700 flex justify-center pt-16">
+      <div className="bg-yellow-100 rounded-2xl shadow-lg w-full max-w-lg p-6">
+        <h1 className="text-center text-3xl font-bold text-gray-800 mb-6">Управление заказами в кофейне</h1>
+        <div className="flex flex-col gap-1 mt-5">
+          <input type="text" placeholder="Имя клиента" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => {
+            if (e.key === 'Enter') handleAddOrder();}} className="border border-gray-300 rounded-lg px-3 py-1 text-sm outline-none focus:bg-yellow-700 transition-colors"/>
+          <input type="text" placeholder="Название напитка" value={coffeeTypeValue} onChange={(e) => setCoffeeTypeValue(e.target.value)} onKeyDown={(e) => {
+            if (e.key === 'Enter') handleAddOrder();}} className="border border-gray-300 rounded-lg px-3 py-1 text-sm outline-none focus:bg-yellow-700 transition-colors"/>
+          <button onClick={handleAddOrder} className="bg-yellow-700 hover:bg-yellow-500 text-white font-medium py-2 rounded-lg transition-colors">Добавить заказ</button>
+        </div>
         <div className="flex gap-2 my-5">
-          <button onClick={() => setFilter('all')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Всё</button>
-          <button onClick={() => setFilter('active')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'active' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Активные</button>
-          <button onClick={() => setFilter('done')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'done' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>Выполненные</button>
+          <button onClick={() => setFilter('all')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'all' ? 'bg-yellow-700 text-white' : 'bg-yellow-500 text-gray-600 hover:bg-yellow-300'}`}>Всё</button>
+          <button onClick={() => setFilter('pending')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'pending' ? 'bg-yellow-700 text-white' : 'bg-yellow-500 text-gray-600 hover:bg-yellow-300'}`}>Готовятся</button>
+          <button onClick={() => setFilter('ready')} className={`rounded-full font-medium px-2 py-1 transition-colors ${filter === 'ready' ? 'bg-yellow-700 text-white' : 'bg-yellow-500 text-gray-600 hover:bg-yellow-300'}`}>Готовы к выдаче</button>
         </div>
         <ul>
-          {filteredTasks.map((task) => (
-            <TodoItem
-              key={task.id}
-              task={task} 
+          {filteredOrders.map((order) => (
+            <OrderCard
+              key={order.id}
+              order={order} 
               editingId={editingId} 
               editingValue={editingValue}
               onToggle={handleToggle} 
-              onDelete={handleDelete} 
+              onDelete={handleDeleteOrder} 
               onEdit={handleEdit} 
               onSave={handleSave} 
               setEditingValue={setEditingValue}/>
           ))}
         </ul>
-        <div className="flex flex-col gap-1 mt-5">
-          <input type="text" placeholder="Задача" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyDown={(e) => {
-            if (e.key === 'Enter') handleAdd();}} className="border border-gray-300 rounded-lg px-3 py-1 text-sm outline-none focus:border-blue-400 transition-colors"/>
-          <input type="text" placeholder="Приоритет" value={priorityValue} onChange={(e) => setPriorityValue(e.target.value)} onKeyDown={(e) => {
-            if (e.key === 'Enter') handleAdd();}} className="border border-gray-300 rounded-lg px-3 py-1 text-sm outline-none focus:border-blue-400 transition-colors"/>
-          <button onClick={handleAdd} className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition-colors">Добавить задачу</button>
-        </div>
       </div>
     </div>
   )
